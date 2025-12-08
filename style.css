@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
 	font-family: Arial, sans-serif;
 	background: #f5f5f5;
@@ -43,4 +44,51 @@ body {
         row-gap: 10px;
         justify-content: center;
     }
+=======
+body {
+	font-family: Arial, sans-serif;
+	background: #f5f5f5;
+	margin: 0;
+	padding: 20px;
+}
+
+.container {
+	max-width: 600px;
+	margin: auto;
+}
+
+.item {
+	background: white;
+	padding: 15px;
+	margin-bottom: 12px;
+	border-radius: 8px;
+	border: 1px solid #ddd;
+}
+
+.item h3 {
+	margin: 0 0 5px;
+}
+
+.item input {
+	padding: 8px;
+	width: 60%;
+}
+
+.item button {
+	padding: 8px 12px;
+	cursor: pointer;
+}
+
+
+/* Адаптив */
+
+@media (max-width: 345px) {
+    .info-box {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        row-gap: 10px;
+        justify-content: center;
+    }
+>>>>>>> 65ee58dc5e096d8460512554fbaffc880ceb399f
 }
