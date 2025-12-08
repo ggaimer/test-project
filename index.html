@@ -65,7 +65,7 @@
                     <b>${product.name}</b><br>
                     Цена: ${product.price} тыщ<br><br>
 
-                    <div style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
+                    <div id='info' style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
                         <input type="number" id="sell-${product.id}" placeholder="Продал за..." style="flex:1;"/>
                         <button onclick="sell('${product.id}')">Добавить продажу</button>
                         <button onclick="showHistory('${product.id}')">📜 История</button>

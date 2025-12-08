@@ -35,6 +35,13 @@ body {
 
 /* Адаптив */
 
+@media (max-width: 582px) {
+    #info {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+}
+
 @media (max-width: 345px) {
     .info-box {
         display: flex;
