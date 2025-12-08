@@ -22,13 +22,13 @@ body {
 	margin: 0 0 5px;
 }
 
-.item input {
-	padding: 8px;
+#info input {
+	padding: 6px;
 	width: 60%;
 }
 
-.item button {
-	padding: 8px 12px;
+#info button {
+	padding: 6px;
 	cursor: pointer;
 }
 
