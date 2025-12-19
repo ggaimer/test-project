@@ -6,18 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Товары</title>
     <link rel="stylesheet" href="./style.css">
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 
 <body>
-    <h2>Товары</h2>
+    <!-- Модальное окно регистрации -->
+    <div id="modal">
+        <div id="modalContent">
+            <h3>Введите ваше имя</h3>
+            <input id="usernameInput" type="text" placeholder="Имя пользователя" />
+            <br><br>
+            <button id="saveUser">Сохранить</button>
+        </div>
+    </div>
 
-    <input id="search" type="text" placeholder="Поиск..." />
-
-    <div id="products"></div>
+    <!-- Приложение -->
+    <div id="app" style="display:none;">
+        <h2>Товары</h2>
+        <p>Привет, <span id="userName"></span>!</p>
+        <input id="search" type="text" placeholder="Поиск..." />
+        <div id="products"></div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"
@@ -30,12 +38,52 @@
             storageBucket: "test-project-8e64c.firebasestorage.app",
             messagingSenderId: "740863324604",
             appId: "1:740863324604:web:f23d401ac37e9aa8513bb9",
-            measurementId: "G-J0M26HK1JM",
             databaseURL: "https://test-project-8e64c-default-rtdb.firebaseio.com/"
         }
 
         const app = initializeApp(firebaseConfig)
         const db = getDatabase(app)
+
+        const modal = document.getElementById("modal")
+        const saveUserBtn = document.getElementById("saveUser")
+        const usernameInput = document.getElementById("usernameInput")
+        const appBox = document.getElementById("app")
+        const userNameSpan = document.getElementById("userName")
+        let currentUser = localStorage.getItem("username")
+
+        // Показать модальное окно
+        function showModal() {
+            modal.style.display = "flex"
+        }
+
+        // Проверка пользователя
+        async function checkUser() {
+            if (!currentUser) {
+                showModal()
+            } else {
+                const snapshot = await get(ref(db, "users/" + currentUser))
+                if (!snapshot.exists()) {
+                    showModal()
+                } else {
+                    appBox.style.display = "block"
+                    userNameSpan.textContent = currentUser
+                }
+            }
+        }
+
+        // Сохранение пользователя
+        saveUserBtn.onclick = async () => {
+            const name = usernameInput.value.trim()
+            if (!name) return alert("Введите имя!")
+            currentUser = name
+            localStorage.setItem("username", name)
+            await set(ref(db, "users/" + name), { created: new Date().toISOString() })
+            modal.style.display = "none"
+            appBox.style.display = "block"
+            userNameSpan.textContent = currentUser
+        }
+
+        checkUser()
 
         // ==== ТОВАРЫ ====
         const PRODUCTS = [
@@ -46,35 +94,28 @@
             { id: "p5", name: "Ozzy Osbourne(lp)", price: 250 },
             { id: "p6", name: "Мальчишник Sex(lp)", price: 100 },
             { id: "p7", name: "Abba(lp)", price: 140 },
-            { id: "p8", name: "Dire straits(lp)", price: 100 },
-            { id: "p9", name: "Александр Малинин(lp)", price: 200 },
-            { id: "p10", name: "Зловещие мертвецы (Сектор Газа)(mc)", price: 150 }
+            { id: "p8", name: "Dire straits(lp)", price: 100 }
         ]
 
-        // Загружаем товары один раз
         PRODUCTS.forEach(item => set(ref(db, "products/" + item.id), item))
 
         const container = document.getElementById("products")
         const searchInput = document.getElementById("search")
 
-        // === РЕНДЕР ТОВАРОВ ===
         function renderProducts(list) {
             container.innerHTML = ""
-
             list.forEach(product => {
                 container.innerHTML += `
-                <div style="border:1px solid gray; padding:10px; margin:10px; position: relative;">
+                <div style="border:1px solid gray; padding:10px; margin:10px;">
                     <b>${product.name}</b><br>
                     Цена: ${product.price} ка<br><br>
 
-                    <div id='info' style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
-                        <input type="number" id="sell-${product.id}" placeholder="Продал за..." style="flex:1;"/>
-                        <button onclick="sell('${product.id}')">Добавить продажу</button>
-                        <button onclick="showHistory('${product.id}')">📜 История</button>
-                        <button onclick="clearHistory('${product.id}')">🗑 Очистить</button>
-                    </div>
+                    <input type="number" id="sell-${product.id}" placeholder="Продал за..." />
+                    <button onclick="sell('${product.id}')">Добавить продажу</button>
+                    <button onclick="showHistory('${product.id}')">📜 История</button>
+                    <button onclick="clearHistory('${product.id}')">🗑 Очистить</button>
 
-                    <div id="history-${product.id}" style="margin-top:10px; display:none; border:1px solid #ccc; padding:12px; background:#f9f9f9; position:relative;">
+                    <div id="history-${product.id}" style="display:none; margin-top:10px; border:1px solid #ccc; padding:10px; position:relative;">
                         <button style="position:absolute; top:5px; right:5px;" onclick="closeHistory('${product.id}')">✖️</button>
                         <div id="history-content-${product.id}" style="margin-top:20px;"></div>
                     </div>
@@ -82,77 +123,67 @@
             })
         }
 
-        // === ДОБАВЛЕНИЕ ПРОДАЖИ ===
+        // ===== ДОБАВЛЕНИЕ ПРОДАЖИ =====
         window.sell = function (productId) {
+            if (!currentUser) return alert("Сначала зарегистрируйтесь!")
+
             const input = document.getElementById("sell-" + productId)
             if (!input.value) return alert("Введите цену!")
 
-            const newSale = { price: Number(input.value), time: new Date().toLocaleString() }
+            const newSale = {
+                price: Number(input.value),
+                user: currentUser
+            }
+
             push(ref(db, "sold/" + productId), newSale)
             input.value = ""
         }
 
-        // === Показать историю продаж в реальном времени ===
+        // ===== ИСТОРИЯ =====
         window.showHistory = function (productId) {
             const box = document.getElementById("history-" + productId)
             const content = document.getElementById("history-content-" + productId)
-            const path = ref(db, "sold/" + productId)
 
-            box.style.display = "block" // показываем блок
+            box.style.display = "block"
 
-            // слушаем изменения в истории
-            onValue(path, snap => {
+            onValue(ref(db, "sold/" + productId), snap => {
                 const data = snap.val()
-                if (!data || Object.keys(data).length === 0) {
+                if (!data) {
                     content.innerHTML = "<i>Пока нет продаж</i>"
                     return
                 }
 
-                // Переворачиваем массив, чтобы новые продажи шли первыми
-                const sales = Object.values(data).reverse()
-
-                content.innerHTML = sales
-                    .map(sale => `
-                <div style="margin-bottom:5px;">
-                    <b>💰 ${sale.price} ка</b><br>
-                    <small>⏳ ${sale.time}</small>
-                    <hr>
-                </div>
-            `).join("")
+                content.innerHTML = Object.values(data).reverse().map(sale => `
+                    <div>
+                        <b>💰 ${sale.price} ка</b><br>
+                        <small>👤 ${sale.user}</small>
+                        <hr>
+                    </div>
+                `).join("")
             })
         }
 
-        // === ЗАКРЫТЬ ИСТОРИЮ ===
-        window.closeHistory = function (productId) {
+        // Закрытие истории
+        window.closeHistory = function(productId) {
             const box = document.getElementById("history-" + productId)
             box.style.display = "none"
         }
 
-        // === ОЧИСТКА ИСТОРИИ ===
         window.clearHistory = function (productId) {
-            const content = document.getElementById("history-content-" + productId)
             remove(ref(db, "sold/" + productId))
-                .then(() => { content.innerHTML = "<i>Пока нет продаж</i>" })
-                .catch(err => alert("Ошибка при очистке: " + err))
         }
 
-        // === ЗАГРУЗКА ТОВАРОВ ===
         onValue(ref(db, "products"), snap => {
             renderProducts(Object.values(snap.val()))
         })
 
-        // === ПОИСК ===
         searchInput.addEventListener("input", () => {
             const q = searchInput.value.toLowerCase()
             get(ref(db, "products")).then(snap => {
                 const all = Object.values(snap.val())
-                const filtered = all.filter(p => p.name.toLowerCase().includes(q))
-                renderProducts(filtered)
+                renderProducts(all.filter(p => p.name.toLowerCase().includes(q)))
             })
         })
     </script>
-
-    <script src="app.js"></script>
 </body>
-
 </html>
