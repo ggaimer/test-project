@@ -39,14 +39,16 @@
 
         // ==== ТОВАРЫ ====
         const PRODUCTS = [
-            { id: "p1", name: "Пицца Маргарита", price: 500 },
-            { id: "p2", name: "Бургер Классический", price: 350 },
-            { id: "p3", name: "Фри картошка", price: 150 },
-            { id: "p4", name: "Шаурма Большая", price: 300 },
-            { id: "p5", name: "Суши сет", price: 900 },
-            { id: "p6", name: "iPhone 11 PRO MAX", price: 270 },
-            { id: "p7", name: "Книги фнаф", price: 120 },
-            { id: "p8", name: "Банданы", price: 40 }
+            { id: "p1", name: "Rolling stones(lp)", price: 130 },
+            { id: "p2", name: "Queen(lp)", price: 180 },
+            { id: "p3", name: "Круиз", price: 120 },
+            { id: "p4", name: "Машина времени(lp)", price: 100 },
+            { id: "p5", name: "Ozzy Osbourne(lp)", price: 250 },
+            { id: "p6", name: "Мальчишник Sex(lp)", price: 100 },
+            { id: "p7", name: "Abba(lp)", price: 140 },
+            { id: "p8", name: "Dire straits(lp)", price: 100 },
+            { id: "p9", name: "Александр Малинин(lp)", price: 200 },
+            { id: "p10", name: "Зловещие мертвецы (Сектор Газа)(mc)", price: 150 }
         ]
 
         // Загружаем товары один раз
@@ -63,7 +65,7 @@
                 container.innerHTML += `
                 <div style="border:1px solid gray; padding:10px; margin:10px; position: relative;">
                     <b>${product.name}</b><br>
-                    Цена: ${product.price} тыщ<br><br>
+                    Цена: ${product.price} ка<br><br>
 
                     <div id='info' style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
                         <input type="number" id="sell-${product.id}" placeholder="Продал за..." style="flex:1;"/>
@@ -112,7 +114,7 @@
                 content.innerHTML = sales
                     .map(sale => `
                 <div style="margin-bottom:5px;">
-                    <b>💰 ${sale.price} тыщ</b><br>
+                    <b>💰 ${sale.price} ка</b><br>
                     <small>⏳ ${sale.time}</small>
                     <hr>
                 </div>
