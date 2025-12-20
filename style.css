@@ -52,19 +52,25 @@ body {
 
 /* Адаптив */
 
-@media (max-width: 582px) {
-    #info {
-        flex-direction: column;
-        gap: 10px !important;
-    }
+@media screen and (max-width: 768px) {
+	#products > div {
+		flex: 1 1 calc(50% - 20px);
+	}
+
+	input[type="number"], button {
+		font-size: 12px;
+		padding: 5px 8px;
+	}
 }
 
-@media (max-width: 345px) {
-    .info-box {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        row-gap: 10px;
-        justify-content: center;
-    }
+@media screen and (max-width: 480px) {
+	#products > div {
+		flex: 1 1 100%;
+	}
+
+	input[type="number"], button {
+		width: 100%;
+		box-sizing: border-box;
+		margin-bottom: 5px;
+	}
 }
