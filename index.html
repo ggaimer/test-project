@@ -116,7 +116,7 @@
                     <button onclick="clearHistory('${product.id}')">🗑 Очистить</button>
 
                     <div id="history-${product.id}" style="display:none; margin-top:10px; border:1px solid #ccc; padding:10px; position:relative;">
-                        <button style="position:absolute; top:5px; right:5px;" onclick="closeHistory('${product.id}')">✖️</button>
+                        <button class='close-button' style="position:absolute; top:5px; right:5px;" onclick="closeHistory('${product.id}')">✖️</button>
                         <div id="history-content-${product.id}" style="margin-top:20px;"></div>
                     </div>
                 </div>`
